@@ -173,3 +173,22 @@ textarea {
   white-space: normal;   /* allow wrapping */
   overflow-wrap: anywhere;
 }
+
+.checkbox-list { display: grid; gap: 12px; }
+
+.chk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+}
+
+.chk input[type="checkbox"]{
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+}
