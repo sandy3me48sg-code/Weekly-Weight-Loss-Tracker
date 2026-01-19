@@ -4,52 +4,89 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Weekly Weight Loss Tracker</title>
-  <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="styles.css" />
   <meta name="theme-color" content="#0b66c3" />
 </head>
+
 <body>
+  <header class="header">
+    <h1>Weekly Weight Loss Tracker</h1>
+    <p class="subtitle">Your private daily health & habit log</p>
+  </header>
 
-<header style="padding:16px; background:#ffffff; border-bottom:1px solid #ddd;">
-  <h1>Weekly Weight Loss Tracker</h1>
-  <p style="color:#666;">Your private daily health & habit log</p>
-</header>
+  <main class="container">
 
-<main style="padding:16px;">
-  <section style="background:#fff; padding:16px; border-radius:8px; margin-bottom:16px;">
-    <h2>🌱 Daily Affirmation</h2>
-    <p id="affirmation" style="font-size:18px; margin-top:8px;"></p>
-    <button onclick="newAffirmation()">New Affirmation</button>
-  </section>
+    <!-- Daily Affirmation -->
+    <section class="card">
+      <h2>🌱 Daily Affirmation</h2>
+      <p id="affirmation" class="affirmation"></p>
+      <button class="btn" onclick="newAffirmation()">New Affirmation</button>
+    </section>
 
-  <section style="background:#fff; padding:16px; border-radius:8px;">
-    <h2>📊 Daily Tracking</h2>
+    <!-- Daily Tracking -->
+    <section class="card">
+      <h2>📊 Daily Tracking</h2>
 
-    <label>Weigh-in:
-      <input type="number" id="weight" placeholder="lbs" />
-    </label><br><br>
+      <div class="grid">
+        <label>Weigh-in (lbs)
+          <input type="number" id="weight" placeholder="lbs" inputmode="decimal" />
+        </label>
 
-    <label>Calories taken:
-      <input type="number" id="calories" />
-    </label><br><br>
+        <label>Calories taken
+          <input type="number" id="calories" inputmode="numeric" />
+        </label>
 
-    <label>Protein (g):
-      <input type="number" id="protein" />
-    </label><br><br>
+        <label>Protein (g)
+          <input type="number" id="protein" inputmode="numeric" />
+        </label>
 
-    <label>Water (oz):
-      <input type="number" id="water" />
-    </label><br><br>
+        <label>Water (oz)
+          <input type="number" id="water" inputmode="numeric" />
+        </label>
 
-    <label>Sleep (hours):
-      <input type="number" id="sleep" />
-    </label><br><br>
+        <label>Sleep (hours)
+          <input type="number" id="sleep" inputmode="decimal" />
+        </label>
+      </div>
 
-    <button onclick="saveDay()">Save Today</button>
-    <p id="savedMsg" style="color:green;"></p>
-  </section>
-</main>
+      <div class="row">
+        <button class="btn" onclick="saveDay()">Save Today</button>
+        <button class="btn ghost" onclick="loadToday()">Load Today</button>
+        <button class="btn ghost" onclick="clearToday()">Clear</button>
+      </div>
 
-<script src="app.js"></script>
+      <p id="savedMsg" class="msg"></p>
+    </section>
+
+    <!-- Weekly Grid -->
+    <section class="card">
+      <div class="row space-between">
+        <h2>🗓️ Weekly Tracker</h2>
+        <div class="row">
+          <button class="btn ghost" onclick="prevWeek()">◀</button>
+          <button class="btn ghost" onclick="nextWeek()">▶</button>
+        </div>
+      </div>
+
+      <p class="small">
+        Week of: <strong id="weekLabel"></strong>
+      </p>
+
+      <div class="tableWrap">
+        <table class="tracker" id="weeklyTable"></table>
+      </div>
+
+      <div class="row">
+        <button class="btn" onclick="saveWeek()">Save Week</button>
+        <button class="btn ghost" onclick="loadWeek()">Load Week</button>
+        <button class="btn ghost" onclick="clearWeek()">Clear Week</button>
+      </div>
+
+      <p id="weekMsg" class="msg"></p>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
 </body>
 </html>
