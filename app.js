@@ -372,3 +372,61 @@ function exportWeekCSV() {
 
   URL.revokeObjectURL(url);
 }
+
+function todayKey(){
+  return new Date().toISOString().slice(0,10); // "2026-01-18"
+}
+
+function getStore(){
+  return JSON.parse(localStorage.getItem("dailyLogs") || "{}");
+}
+
+function setStore(store){
+  localStorage.setItem("dailyLogs", JSON.stringify(store));
+}
+
+function readForm(){
+  return {
+    weight: document.getElementById("weight")?.value || "",
+    calories: document.getElementById("calories")?.value || "",
+    protein: document.getElementById("protein")?.value || "",
+    water: document.getElementById("water")?.value || "",
+    sleep: document.getElementById("sleep")?.value || "",
+    goals: {
+      steps: document.getElementById("goal_steps")?.checked || false,
+      run: document.getElementById("goal_run")?.checked || false,
+      waterGoal: document.getElementById("goal_water")?.checked || false,
+      supps: document.getElementById("goal_supps")?.checked || false,
+    },
+    notes: document.getElementById("weeklyNotes")?.value || ""
+  };
+}
+
+function writeForm(data){
+  document.getElementById("weight").value = data.weight || "";
+  document.getElementById("calories").value = data.calories || "";
+  document.getElementById("protein").value = data.protein || "";
+  document.getElementById("water").value = data.water || "";
+  document.getElementById("sleep").value = data.sleep || "";
+
+  document.getElementById("goal_steps").checked = !!data.goals?.steps;
+  document.getElementById("goal_run").checked = !!data.goals?.run;
+  document.getElementById("goal_water").checked = !!data.goals?.waterGoal;
+  document.getElementById("goal_supps").checked = !!data.goals?.supps;
+
+  document.getElementById("weeklyNotes").value = data.notes || "";
+}
+
+function saveToday(){
+  const store = getStore();
+  store[todayKey()] = readForm();
+  setStore(store);
+  alert("Saved today ✅");
+}
+
+function loadToday(){
+  const store = getStore();
+  const data = store[todayKey()];
+  if (!data) return alert("No saved data for today yet.");
+  writeForm(data);
+}
