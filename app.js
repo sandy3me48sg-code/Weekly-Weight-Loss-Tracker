@@ -430,3 +430,83 @@ function loadToday(){
   if (!data) return alert("No saved data for today yet.");
   writeForm(data);
 }
+
+function todayKey(prefix) {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${prefix}-${y}-${m}-${day}`;
+}
+
+/* ===== HABITS (daily) ===== */
+function saveHabits() {
+  const key = todayKey("habits");
+  const data = {};
+  document.querySelectorAll('#habits input[type="checkbox"]').forEach(cb => {
+    data[cb.dataset.key] = cb.checked;
+  });
+  localStorage.setItem(key, JSON.stringify(data));
+  alert("Saved today’s habits ✅");
+}
+
+function loadHabits() {
+  const key = todayKey("habits");
+  const raw = localStorage.getItem(key);
+  if (!raw) return alert("No saved habits for today yet.");
+  const data = JSON.parse(raw);
+
+  document.querySelectorAll('#habits input[type="checkbox"]').forEach(cb => {
+    cb.checked = !!data[cb.dataset.key];
+  });
+}
+
+/* ===== DAILY NUMBERS (daily) ===== */
+function saveDay() {
+  const key = todayKey("day");
+  const dayData = {
+    weight: document.getElementById("weight")?.value || "",
+    calories: document.getElementById("calories")?.value || "",
+    protein: document.getElementById("protein")?.value || "",
+    water: document.getElementById("water")?.value || "",
+    sleep: document.getElementById("sleep")?.value || ""
+  };
+  localStorage.setItem(key, JSON.stringify(dayData));
+  alert("Saved today ✅");
+  updateWeeklyAvg();
+}
+
+function loadDay() {
+  const key = todayKey("day");
+  const raw = localStorage.getItem(key);
+  if (!raw) return alert("No saved data for today yet.");
+  const d = JSON.parse(raw);
+
+  if (document.getElementById("weight")) document.getElementById("weight").value = d.weight ?? "";
+  if (document.getElementById("calories")) document.getElementById("calories").value = d.calories ?? "";
+  if (document.getElementById("protein")) document.getElementById("protein").value = d.protein ?? "";
+  if (document.getElementById("water")) document.getElementById("water").value = d.water ?? "";
+  if (document.getElementById("sleep")) document.getElementById("sleep").value = d.sleep ?? "";
+}
+
+/* ===== WEEKLY AVG (based on last 7 days of saved weights) ===== */
+function updateWeeklyAvg() {
+  let weights = [];
+  for (let i=0; i<7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    const key = `day-${y}-${m}-${day}`;
+    const raw = localStorage.getItem(key);
+    if (!raw) continue;
+    const obj = JSON.parse(raw);
+    const w = parseFloat(obj.weight);
+    if (!isNaN(w)) weights.push(w);
+  }
+
+  const avg = weights.length ? (weights.reduce((a,b)=>a+b,0) / weights.length) : null;
+  const el = document.getElementById("weeklyAvgWeight");
+  if (el) el.textContent = avg ? avg.toFixed(1) : "—";
+}
