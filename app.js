@@ -216,3 +216,159 @@ function nextWeek() {
   buildWeeklyTable();
   loadWeek();
 })();
+// ---------- WEEK EXTRAS (checkboxes + notes) ----------
+const WEEK_EXTRAS_KEY = "weekExtras_v1";
+
+function saveWeekExtras() {
+  const notes = document.getElementById("weeklyNotes")?.value || "";
+
+  const boxWrap = document.getElementById("weeklyCheckboxes");
+  const checks = {};
+  if (boxWrap) {
+    boxWrap.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+      checks[cb.dataset.key] = cb.checked;
+    });
+  }
+
+  localStorage.setItem(WEEK_EXTRAS_KEY, JSON.stringify({ notes, checks }));
+  const msg = document.getElementById("weekExtrasMsg");
+  if (msg) msg.textContent = "Saved ✅";
+  updateWeeklyAverage();
+}
+
+function loadWeekExtras() {
+  const raw = localStorage.getItem(WEEK_EXTRAS_KEY);
+  if (!raw) return;
+
+  const data = JSON.parse(raw);
+  const notesBox = document.getElementById("weeklyNotes");
+  if (notesBox) notesBox.value = data.notes || "";
+
+  const boxWrap = document.getElementById("weeklyCheckboxes");
+  if (boxWrap && data.checks) {
+    boxWrap.querySelectorAll('input[type="checkbox"][data-key]').forEach(cb => {
+      cb.checked = !!data.checks[cb.dataset.key];
+    });
+  }
+
+  const msg = document.getElementById("weekExtrasMsg");
+  if (msg) msg.textContent = "Loaded ✅";
+  updateWeeklyAverage();
+}
+
+// ---------- WEEKLY AVERAGE (weights) ----------
+// This calculates from your SAVED daily weights.
+// It will work if your saveDay() stores weight in localStorage (most builds do).
+// If yours uses a different key, tell me what your daily save key is and I’ll match it.
+function getSavedDailyWeights() {
+  // Common patterns:
+  const todayKey = "today_v1";       // sometimes daily saves under a fixed key
+  const dailyLogKey = "dailyLog_v1"; // sometimes daily saves in an object log
+
+  let weights = [];
+
+  // Try today_v1-style history (if you store per-day, adapt later)
+  // Try dailyLog_v1 where it stores an array or object of entries
+  const logRaw = localStorage.getItem(dailyLogKey);
+  if (logRaw) {
+    try {
+      const log = JSON.parse(logRaw);
+
+      // If it's an array of entries
+      if (Array.isArray(log)) {
+        log.forEach(e => {
+          const w = parseFloat(e.weight);
+          if (!isNaN(w)) weights.push(w);
+        });
+      }
+
+      // If it's an object keyed by date
+      if (!Array.isArray(log) && typeof log === "object" && log) {
+        Object.values(log).forEach(e => {
+          const w = parseFloat(e.weight);
+          if (!isNaN(w)) weights.push(w);
+        });
+      }
+    } catch (e) {}
+  }
+
+  // Fallback: if only "today" exists, still show it
+  const todayRaw = localStorage.getItem(todayKey);
+  if (todayRaw) {
+    try {
+      const t = JSON.parse(todayRaw);
+      const w = parseFloat(t.weight);
+      if (!isNaN(w)) weights.push(w);
+    } catch (e) {}
+  }
+
+  return weights;
+}
+
+function updateWeeklyAverage() {
+  const out = document.getElementById("weeklyAvg");
+  if (!out) return;
+
+  const weights = getSavedDailyWeights();
+  if (!weights.length) {
+    out.textContent = "—";
+    return;
+  }
+
+  const avg = weights.reduce((a, b) => a + b, 0) / weights.length;
+  out.textContent = avg.toFixed(1) + " lbs";
+}
+
+// Run on page load
+document.addEventListener("DOMContentLoaded", () => {
+  loadWeekExtras();
+  updateWeeklyAverage();
+
+  // Optional: recalc when any checkbox changes
+  const boxWrap = document.getElementById("weeklyCheckboxes");
+  if (boxWrap) {
+    boxWrap.addEventListener("change", () => saveWeekExtras());
+  }
+});
+
+// ---------- EXPORT WEEK (CSV) ----------
+function exportWeekCSV() {
+  const weights = getSavedDailyWeights();
+  const avgEl = document.getElementById("weeklyAvg");
+  const avgText = avgEl ? avgEl.textContent : "";
+
+  const raw = localStorage.getItem(WEEK_EXTRAS_KEY);
+  let notes = "";
+  let checks = {};
+  if (raw) {
+    try {
+      const data = JSON.parse(raw);
+      notes = (data.notes || "").replace(/\n/g, " ");
+      checks = data.checks || {};
+    } catch (e) {}
+  }
+
+  const checkPairs = Object.entries(checks).map(([k, v]) => `${k}:${v ? "yes" : "no"}`).join(" | ");
+
+  const rows = [
+    ["Weekly Average", avgText],
+    ["Weights Saved (count)", String(weights.length)],
+    ["Weights", weights.join(" ")],
+    ["Checkboxes", checkPairs],
+    ["Weekly Notes", notes],
+  ];
+
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "weekly-tracker-export.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  URL.revokeObjectURL(url);
+}
