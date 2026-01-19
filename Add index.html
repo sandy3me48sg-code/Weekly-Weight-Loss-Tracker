@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weekly Weight Loss Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="theme-color" content="#0b66c3" />
+</head>
+<body>
+
+<header style="padding:16px; background:#ffffff; border-bottom:1px solid #ddd;">
+  <h1>Weekly Weight Loss Tracker</h1>
+  <p style="color:#666;">Your private daily health & habit log</p>
+</header>
+
+<main style="padding:16px;">
+  <section style="background:#fff; padding:16px; border-radius:8px; margin-bottom:16px;">
+    <h2>🌱 Daily Affirmation</h2>
+    <p id="affirmation" style="font-size:18px; margin-top:8px;"></p>
+    <button onclick="newAffirmation()">New Affirmation</button>
+  </section>
+
+  <section style="background:#fff; padding:16px; border-radius:8px;">
+    <h2>📊 Daily Tracking</h2>
+
+    <label>Weigh-in:
+      <input type="number" id="weight" placeholder="lbs" />
+    </label><br><br>
+
+    <label>Calories taken:
+      <input type="number" id="calories" />
+    </label><br><br>
+
+    <label>Protein (g):
+      <input type="number" id="protein" />
+    </label><br><br>
+
+    <label>Water (oz):
+      <input type="number" id="water" />
+    </label><br><br>
+
+    <label>Sleep (hours):
+      <input type="number" id="sleep" />
+    </label><br><br>
+
+    <button onclick="saveDay()">Save Today</button>
+    <p id="savedMsg" style="color:green;"></p>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
