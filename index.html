@@ -90,3 +90,40 @@
   <script src="app.js"></script>
 </body>
 </html>
+<section class="card">
+  <h2>📅 Weekly Tracker</h2>
+
+  <div class="row">
+    <div class="pill">
+      <strong>Weekly Avg Weight:</strong>
+      <span id="weeklyAvg">—</span>
+    </div>
+
+    <button type="button" onclick="exportWeekCSV()">Export Week (CSV)</button>
+  </div>
+
+  <hr />
+
+  <h3>✅ Goals / Habits (checkboxes)</h3>
+  <div class="checkbox-grid" id="weeklyCheckboxes">
+    <label><input type="checkbox" data-key="fast"> Fast followed</label>
+    <label><input type="checkbox" data-key="steps10k"> 10,000 steps</label>
+    <label><input type="checkbox" data-key="strength"> Strength</label>
+    <label><input type="checkbox" data-key="run"> Run/Jog</label>
+    <label><input type="checkbox" data-key="hiit"> HIIT</label>
+    <label><input type="checkbox" data-key="water"> Water goal</label>
+    <label><input type="checkbox" data-key="sleep"> Sleep goal</label>
+    <label><input type="checkbox" data-key="supplements"> Supplements</label>
+  </div>
+
+  <hr />
+
+  <h3>📝 Weekly Notes</h3>
+  <textarea id="weeklyNotes" rows="5" placeholder="How did this week go? Any wins, struggles, symptoms, patterns, etc."></textarea>
+
+  <div class="row" style="margin-top:12px;">
+    <button type="button" onclick="saveWeekExtras()">Save Weekly Notes + Checkboxes</button>
+    <button type="button" onclick="loadWeekExtras()">Load Weekly Notes + Checkboxes</button>
+    <p id="weekExtrasMsg" class="msg"></p>
+  </div>
+</section>
